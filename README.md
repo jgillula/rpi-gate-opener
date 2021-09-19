@@ -5,8 +5,13 @@ This little gadget allows you to connect a [300 MHz, 10 dip-switch remote gate o
 
 It connects directly to an off-the-shelf gate opener remote (sold separately) and uses a 5V relay for triggering the gate opener and a voltage conversion circuit for powering the gate opener (replacing the gate opener's battery). It requires only 5V power, ground, and a single GPIO pin from your Raspberry Pi.
 
-## How Do I Use It?
-It's simple! Just follow [the instructions in my tutorial](https://www.hackster.io/jeremy-gillula/raspberry-pi-wireless-gate-opener-734460) to finish assembly of your controller circuit.
-
 ## Can I just buy one from you?
 Yes! You can [buy this kit at different levels of assembly from me on Tindie](https://www.tindie.com/products/flyingsaucrdude/raspberry-pi-gate-opener-adapter/).
+
+## I'd rather build one myself!
+Great! Just follow [the instructions in my tutorial](https://www.hackster.io/jeremy-gillula/raspberry-pi-wireless-gate-opener-734460) to finish assembly of your controller circuit.
+
+## What's in the repo?
+
+- **pcb** — Extended Gerber (RS-274X) files for PCB fabrication (at, e.g., [OSH Park](https://oshpark.com/))
+- **Gate Opener Controller Circuit.fzz** — Fritzing file containing schematic and PCB layout
