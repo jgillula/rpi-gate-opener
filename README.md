@@ -17,4 +17,4 @@ Great! Just follow [the instructions in my tutorial](https://www.hackster.io/jer
 
 - **[images](images)** — Pictures of the finished product
 - **[pcb](pcb)** — Extended Gerber (RS-274X) files for PCB fabrication (at, e.g., [OSH Park](https://oshpark.com/))
-- **[Gate Opener Controller Circuit.fzz](Gate Opener Controller Circuit.fzz)** — Fritzing file containing schematic and PCB layout
+- **[Gate_Opener_Controller_Circuit.fzz](Gate_Opener_Controller_Circuit.fzz)** — Fritzing file containing schematic and PCB layout
