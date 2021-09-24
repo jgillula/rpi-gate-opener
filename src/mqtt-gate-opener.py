@@ -7,7 +7,6 @@ import configparser
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
 
-config_filename = "mqtt-gate-opener.conf"
 GPIO_PIN = None
 command_topic = "gate-opener/open"
 
@@ -32,6 +31,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGTERM, lambda x,y: disconnect(client))
 
     parser = configparser.ConfigParser()
+    config_filename = "mqtt-gate-opener.conf"
     with open(config_filename) as stream:
         parser.read_string("[Gate-Opener]\n" + stream.read())
     config = parser["Gate-Opener"]

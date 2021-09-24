@@ -20,7 +20,9 @@ LN_S = @LN_S@
 INSTALL = @INSTALL@
 MKDIR_P = @MKDIR_P@
 
-default: build_dir conf_file py_file service_file
+all: build
+
+build: build_dir conf_file py_file service_file
 
 build_dir: $(srcdir)/$(builddir)
 
@@ -51,9 +53,17 @@ endif
 # variable is set to anything other than "no", set up a new virtualenv and install there, otherwise
 # install as usual from setup.py
 install: build installdirs virtualenv
-	$(INSTALL) $(builddir)/mqtt-gate-opener.py $(libdir)/$(DESTDIR)
-	$(INSTALL) -m 644 $(builddir)/mqtt-gate-opener.service $(libdir)/$(DESTDIR)
-	$(INSTALL) -m 644 $(builddir)/mqtt-gate-opener.conf $(sysconfdir)	
+	$(INSTALL) -o $(SERVICE_USER) $(srcdir)/$(builddir)/mqtt-gate-opener.py $(libdir)/$(DESTDIR)
+	$(INSTALL) -o $(SERVICE_USER) -m 664 $(srcdir)/$(builddir)/mqtt-gate-opener.service $(libdir)/$(DESTDIR)
+	@if test -f "$(sysconfdir)/mqtt-gate-opener.conf"; then \
+		if cmp -s "$(srcdir)/$(builddir)/mqtt-gate-opener.conf" "$(sysconfdir)/mqtt-gate-opener.conf" ; then \
+			$(INSTALL) -o $(SERVICE_USER) -m 664 $(builddir)/mqtt-gate-opener.conf $(sysconfdir) ; \
+		else \
+			echo "WARNING! Leaving $(sysconfdir)/mqtt-gate-opener.conf since it has local changes" ; \
+			echo "         If you want to overwrite it, do:" ; \
+			echo "         sudo $(INSTALL) -o $(SERVICE_USER) -m 644 $(srcdir)/$(builddir)/mqtt-gate-opener.conf $(sysconfdir)" ; \
+		fi \
+	fi
 	$(LN_S) -f $(libdir)/$(DESTDIR)/mqtt-gate-opener.service $(libdir)/systemd/system/.
 	systemctl enable --now mqtt-gate-opener
 
@@ -76,8 +86,12 @@ uninstall:
 	fi
 	find $(libdir) -type d -empty -delete
 
-installdirs:
+installdirs: $(libdir)/$(DESTDIR) $(libdir)/systemd/system
+
+$(libdir)/$(DESTDIR):
 	$(MKDIR_P) $(libdir)/$(DESTDIR)
+
+$(libdir)/systemd/system:
 	$(MKDIR_P) $(libdir)/systemd/system
 
 clean:
