@@ -15,7 +15,7 @@ Great! Just follow [the instructions in my tutorial](https://www.hackster.io/jer
 
 ## What's in the repo?
 
-- **[build](build)** — Scripts and files for generating the ```[configure](configure)``` script. End users shouldn't need to worry about this.
+- **[build](build)** — Scripts and files for generating the [```configure```](configure) script. End users shouldn't need to worry about this.
 - **[images](images)** — Pictures of the finished product
 - **[pcb](pcb)** — Extended Gerber (RS-274X) files for PCB fabrication (at, e.g., [OSH Park](https://oshpark.com/))
 - **[src](src)** — Source code for controlling the gate opener over MQTT (and Home Assistant). For more information, see [the instructions on hackster.io](https://www.hackster.io/jeremy-gillula/connecting-a-remote-gate-opener-to-a-raspberry-pi-734460#toc-7--bonus--controlling-the-gate-via-mqtt-and-home-assistant-8).
