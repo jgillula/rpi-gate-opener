@@ -1,0 +1,84 @@
+# Makefile.in
+VPATH = @srcdir@
+
+# Directories
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+DESTDIR = mqtt-gate-opener
+builddir = tmp
+libdir = @libdir@
+srcdir = @srcdir@
+sysconfdir = @sysconfdir@
+
+# Configuration options
+VIRTUALENV = @VIRTUALENV@
+SERVICE_USER = @SERVICE_USER@
+
+# Commands
+SED = @SED@
+LN_S = @LN_S@
+INSTALL = @INSTALL@
+MKDIR_P = @MKDIR_P@
+
+default: build_dir conf_file py_file service_file
+
+build_dir: $(srcdir)/$(builddir)
+
+$(srcdir)/$(builddir):
+	$(MKDIR_P) $(srcdir)/$(builddir)
+
+conf_file: $(srcdir)/$(builddir)/mqtt-gate-opener.conf build_dir
+
+$(srcdir)/$(builddir)/mqtt-gate-opener.conf: $(srcdir)/src/mqtt-gate-opener.conf
+	cp $(srcdir)/src/mqtt-gate-opener.conf $(srcdir)/$(builddir)/.
+
+py_file: $(srcdir)/$(builddir)/mqtt-gate-opener.py build_dir
+
+$(srcdir)/$(builddir)/mqtt-gate-opener.py: $(srcdir)/src/mqtt-gate-opener.py
+	cp $(srcdir)/src/mqtt-gate-opener.py $(srcdir)/$(builddir)/.
+	$(SED) -i -e "s:mqtt-gate-opener.conf:$(sysconfdir)/mqtt-gate-opener.conf:g" $(builddir)/mqtt-gate-opener.py
+
+service_file: $(srcdir)/$(builddir)/mqtt-gate-opener.service build_dir
+
+$(srcdir)/$(builddir)/mqtt-gate-opener.service: $(srcdir)/src/mqtt-gate-opener.service
+	cp $(srcdir)/src/mqtt-gate-opener.service $(srcdir)/$(builddir)/.
+	$(SED) -i -e "s/user=pi/user=$(SERVICE_USER)/g" -e "s:/usr/local/lib:$(libdir):g" $(builddir)/mqtt-gate-opener.service
+ifneq ($(VIRTUALENV),no)
+	$(SED) -i -e "s:ExecStart=:ExecStart=$(libdir)/$(DESTDIR)/venv/bin/python3 :g" $(builddir)/mqtt-gate-opener.service
+endif
+
+# Since installing to a virtualenv is all the rage these days, support it here. If the VIRTUALENV
+# variable is set to anything other than "no", set up a new virtualenv and install there, otherwise
+# install as usual from setup.py
+install: build installdirs virtualenv
+	$(INSTALL) $(builddir)/mqtt-gate-opener.py $(libdir)/$(DESTDIR)
+	$(INSTALL) -m 644 $(builddir)/mqtt-gate-opener.service $(libdir)/$(DESTDIR)
+	$(INSTALL) -m 644 $(builddir)/mqtt-gate-opener.conf $(sysconfdir)	
+	$(LN_S) -f $(libdir)/$(DESTDIR)/mqtt-gate-opener.service $(libdir)/systemd/system/.
+	systemctl enable --now mqtt-gate-opener
+
+virtualenv: installdirs
+ifneq ($(VIRTUALENV),no)
+	$(VIRTUALENV) $(VIRTUALENV_FLAGS) $(libdir)/$(DESTDIR)/venv || $(VIRTUALENV) $(libdir)/$(DESTDIR)/venv
+	. $(libdir)/$(DESTDIR)/venv/bin/activate && pip install RPi.GPIO paho.mqtt
+endif
+
+uninstall: 
+	systemctl disable --now mqtt-gate-opener || true
+	rm -rf $(libdir)/$(DESTDIR)
+	rm -f $(libdir)/systemd/system/mqtt-gate-opener.service
+	@if test -f "$(sysconfdir)/mqtt-gate-opener.conf"; then \
+		if cmp -s "$(builddir)/mqtt-gate-opener.conf" "$(sysconfdir)/mqtt-gate-opener.conf" ; then \
+			rm -f $(sysconfdir)/mqtt-gate-opener.conf ; \
+		else \
+			echo "Leaving $(sysconfdir)/mqtt-gate-opener.conf since it has local changes" ; \
+		fi \
+	fi
+	find $(libdir) -type d -empty -delete
+
+installdirs:
+	$(MKDIR_P) $(libdir)/$(DESTDIR)
+	$(MKDIR_P) $(libdir)/systemd/system
+
+clean:
+	rm -rf $(builddir)

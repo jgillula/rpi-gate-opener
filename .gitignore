@@ -1,0 +1,9 @@
+Makefile
+config.status
+config.log
+*~
+build/setup.py.in
+build/autom4te.cache
+build/bootstrap.sh
+build/m4
+tmp

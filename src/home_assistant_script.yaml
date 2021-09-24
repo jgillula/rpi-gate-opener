@@ -1,0 +1,6 @@
+open_gate
+  alias: Open the gate
+  sequence:
+  - service: mqtt.publish
+    data:
+      topic: "gate-opener/open"
