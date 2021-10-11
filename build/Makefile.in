@@ -70,7 +70,7 @@ install: build installdirs virtualenv
 virtualenv: installdirs
 ifneq ($(VIRTUALENV),no)
 	$(VIRTUALENV) $(VIRTUALENV_FLAGS) $(libdir)/$(DESTDIR)/venv || $(VIRTUALENV) $(libdir)/$(DESTDIR)/venv
-	. $(libdir)/$(DESTDIR)/venv/bin/activate && pip install RPi.GPIO paho.mqtt
+	. $(libdir)/$(DESTDIR)/venv/bin/activate && pip install RPi.GPIO paho.mqtt python-socketio
 endif
 
 uninstall: 

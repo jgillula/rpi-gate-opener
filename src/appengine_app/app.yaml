@@ -1,0 +1,20 @@
+runtime: python39
+
+entrypoint: python3 main.py
+
+# Put the secrets you define in the Secrets Manager
+#  (https://console.cloud.google.com/security/secret-manager) here
+# Replace PROJECT_NUMBER with your project's Project number (This is
+#  all digits; NOT the Project ID which is of the form
+#  word-word-123456)
+env_variables:
+#  ALLOWED_HOST_SECRET_NAME: "projects/PROJECT_NUMBER/secrets/gate_opener_allowed_host"
+#  AUTH_TOKEN_SECRET_NAME: "projects/PROJECT_NUMBER/secrets/gate_opener_auth_token"
+#  SOCKETIO_PATH_SECRET_NAME: "projects/PROJECT_NUMBER/secrets/gate_opener_socketio_path"
+
+# This section makes sure we always upgrade to HTTPS
+handlers:
+- url: /.*
+  secure: always
+  redirect_http_response_code: 301
+  script: auto
