@@ -4,8 +4,8 @@ import time
 import signal
 import sys
 import threading
-import json
 import configparser
+import json
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
 import socketio
@@ -13,19 +13,18 @@ import socketio
 GPIO_PIN = None
 command_topic = "gate-opener/open"
 
-socketio_client = socketio.Client()
 access_tokens = set()
 access_tokens_lock = threading.Lock()
+reconnect_socketio_client = True
 
-@socketio_client.on("connect")
-def connect():
+def connect(socketio_client):
     socketio_client.send(["clear_access_tokens"])
     with access_tokens_lock:
         socketio_client.send(["add_access_tokens", list(access_tokens)])
     print("Connected to AppEngine server")
+    sys.stdout.flush()
     
-@socketio_client.on("message")
-def message(data):
+def message(socketio_client, data):
     if isinstance(data, list):
         if data[0] == "open_gate" and len(data) >= 2:
             with access_tokens_lock:
@@ -47,14 +46,31 @@ def on_connect(client, userdata, flags, rc):
     client.message_callback_add(command_topic, open_called)
     client.subscribe(command_topic)
 
-def disconnect(client):
+def disconnect(client, socketio_client, socketio_thread):
     print("Shutting down MQTT gate opener")
+    reconnect_socketio_client = False
+    socketio_client.disconnect()
+    socketio_thread.join()
     client.disconnect()
-    if socketio_client.connected:
-        print("Shutting down App Engine client")
-        socketio_client.disconnect()
     GPIO.cleanup(GPIO_PIN)
+    print("Shut down successful")
+    sys.stdout.flush()
     sys.exit(0)
+
+def socketio_thread_function(mqtt_client, cloud_server_url, cloud_auth_token, cloud_socketio_path):
+    try:
+        while reconnect_socketio_client:
+            print("(Re)connecting to Appengine server")
+            socketio_client = socketio.Client()
+            socketio_client.event(lambda: connect(socketio_client))
+            socketio_client.event(lambda data: message(socketio_client, data))
+            socketio_client.connect(cloud_server_url,
+                                    auth={"auth_token": cloud_auth_token},
+                                    socketio_path=cloud_socketio_path)
+            sys.stdout.flush()
+            socketio_client.wait()
+    except KeyboardInterrupt:
+        disconnect(mqtt_client, socketio_client)
 
 if __name__ == "__main__":
     print("Loading MQTT gate opener")
@@ -81,6 +97,10 @@ if __name__ == "__main__":
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(GPIO_PIN, GPIO.OUT)
 
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.connect(mqtt_server, mqtt_server_port)
+
     if "Cloud Settings" in parser.sections():
         cloud_settings = parser["Cloud Settings"]
         cloud_auth_token = cloud_settings.get("auth_token")
@@ -96,14 +116,10 @@ if __name__ == "__main__":
             print(" access_urls:")
             for token in access_tokens:
                 print("  {}/{}".format(cloud_server_url, token))
-            socketio_client.connect(cloud_server_url,
-                                    auth={"auth_token": cloud_auth_token},
-                                    socketio_path=cloud_socketio_path)
+            socketio_thread = threading.Thread(target=socketio_thread_function,
+                                               args=(mqtt_client, cloud_server_url, cloud_auth_token, cloud_socketio_path))
+            socketio_thread.start()
     
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.connect(mqtt_server, mqtt_server_port)
-
     print("MQTT gate opener running")
     sys.stdout.flush()
     
@@ -111,6 +127,4 @@ if __name__ == "__main__":
         client.loop_forever()
     except KeyboardInterrupt:
         print("Killing MQTT gate opener")
-        socketio_client.disconnect()
-        client.disconnect()
-        GPIO.cleanup(GPIO_PIN)
+        disconnect(client, socketio_client)
