@@ -4,6 +4,7 @@ import time
 import signal
 import sys
 import threading
+import json
 import configparser
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
@@ -29,17 +30,18 @@ def message(data):
         if data[0] == "open_gate" and len(data) >= 2:
             with access_tokens_lock:
                 if data[1] in access_tokens:
-                    trigger_gate()
+                    trigger_gate(data[1])
                     socketio_client.send(["ack"])
 
-def trigger_gate():
-    print("Opening gate")
+def trigger_gate(trigger=None):
+    print("Opening gate for {}".format(trigger))
+    sys.stdout.flush()
     GPIO.output(GPIO_PIN, GPIO.HIGH)
     time.sleep(0.25)
     GPIO.output(GPIO_PIN, GPIO.LOW)
                 
 def open_called(client, userdata, msg):
-    trigger_gate()
+    trigger_gate("mqtt")
     
 def on_connect(client, userdata, flags, rc):
     client.message_callback_add(command_topic, open_called)
@@ -48,6 +50,9 @@ def on_connect(client, userdata, flags, rc):
 def disconnect(client):
     print("Shutting down MQTT gate opener")
     client.disconnect()
+    if socketio_client.connected:
+        print("Shutting down App Engine client")
+        socketio_client.disconnect()
     GPIO.cleanup(GPIO_PIN)
     sys.exit(0)
 
@@ -77,19 +82,20 @@ if __name__ == "__main__":
     GPIO.setup(GPIO_PIN, GPIO.OUT)
 
     if "Cloud Settings" in parser.sections():
-        cloud_config = parser["Cloud Settings"]
-        cloud_auth_token = cloud_config.get("auth_token")
-        cloud_socketio_path = cloud_config.get("socketio_path", "socket.io")
-        cloud_server_url = cloud_config.get("server_url")
+        cloud_settings = parser["Cloud Settings"]
+        cloud_auth_token = cloud_settings.get("auth_token")
+        cloud_socketio_path = cloud_settings.get("socketio_path", "socket.io")
+        cloud_server_url = cloud_settings.get("server_url")
 
-        if "Cloud Tokens" in parser.sections():
-            cloud_token_list = parser["Cloud Tokens"]
-            with access_tokens_lock:
-                access_tokens.update([cloud_token_list[key] for key in cloud_token_list])            
+        with access_tokens_lock:
+            access_tokens.update(json.loads(cloud_settings.get("access_tokens", "[]")))
             
         if cloud_server_url:
             print("Using appengine server {}".format(cloud_server_url))
             print(" socketio_path={}".format(cloud_socketio_path))
+            print(" access_urls:")
+            for token in access_tokens:
+                print("  {}/{}".format(cloud_server_url, token))
             socketio_client.connect(cloud_server_url,
                                     auth={"auth_token": cloud_auth_token},
                                     socketio_path=cloud_socketio_path)
