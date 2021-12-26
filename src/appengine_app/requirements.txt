@@ -1,5 +1,6 @@
 Flask>=2.0.0
 google-cloud-secret-manager>=2.7.0
+google-cloud-resource-manager>=1.2.0
 dnspython>=2.1.0
 python-socketio>=5.4.0
 simple-websocket>=0.4.0
