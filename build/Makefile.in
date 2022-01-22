@@ -38,13 +38,12 @@ py_file: $(srcdir)/$(builddir)/mqtt-gate-opener.py build_dir
 
 $(srcdir)/$(builddir)/mqtt-gate-opener.py: $(srcdir)/src/mqtt-gate-opener.py
 	cp $(srcdir)/src/mqtt-gate-opener.py $(srcdir)/$(builddir)/.
-	$(SED) -i -e "s:mqtt-gate-opener.conf:$(sysconfdir)/mqtt-gate-opener.conf:g" $(builddir)/mqtt-gate-opener.py
 
 service_file: $(srcdir)/$(builddir)/mqtt-gate-opener.service build_dir
 
 $(srcdir)/$(builddir)/mqtt-gate-opener.service: $(srcdir)/src/mqtt-gate-opener.service
 	cp $(srcdir)/src/mqtt-gate-opener.service $(srcdir)/$(builddir)/.
-	$(SED) -i -e "s/user=pi/user=$(SERVICE_USER)/g" -e "s:/usr/local/lib:$(libdir):g" $(builddir)/mqtt-gate-opener.service
+	$(SED) -i -e "s/user=pi/user=$(SERVICE_USER)/g" -e "s:/usr/local/lib:$(libdir):g" -e "s:/usr/local/etc:$(sysconfdir):g" $(builddir)/mqtt-gate-opener.service
 ifneq ($(VIRTUALENV),no)
 	$(SED) -i -e "s:ExecStart=:ExecStart=$(libdir)/$(DESTDIR)/venv/bin/python3 :g" $(builddir)/mqtt-gate-opener.service
 endif

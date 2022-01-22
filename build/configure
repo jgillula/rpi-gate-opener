@@ -2678,9 +2678,9 @@ if test "$pc_cv_python_module_paho_mqtt" = "no"; then :
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Python 'socketio' library" >&5
-$as_echo_n "checking for Python 'socketio' library... " >&6; }
-if ${pc_cv_python_module_socketio+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Python 'argparse' library" >&5
+$as_echo_n "checking for Python 'argparse' library... " >&6; }
+if ${pc_cv_python_module_argparse+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_ext=py
@@ -2696,7 +2696,7 @@ else
 #!$PYTHON
 import sys
 try:
-    import socketio
+    import argparse
 except:
     sys.exit(1)
 else:
@@ -2705,9 +2705,9 @@ else:
 
 _ACEOF
 if ac_fn_py_try_run "$LINENO"; then :
-  pc_cv_python_module_socketio="yes"
+  pc_cv_python_module_argparse="yes"
 else
-  pc_cv_python_module_socketio="no"
+  pc_cv_python_module_argparse="no"
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
@@ -2720,10 +2720,59 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $pc_cv_python_module_socketio" >&5
-$as_echo "$pc_cv_python_module_socketio" >&6; }
-if test "$pc_cv_python_module_socketio" = "no"; then :
-  as_fn_append missing_python_packages "python-socketio "
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $pc_cv_python_module_argparse" >&5
+$as_echo "$pc_cv_python_module_argparse" >&6; }
+if test "$pc_cv_python_module_argparse" = "no"; then :
+  as_fn_append missing_python_packages "argparse "
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Python 'pathlib' library" >&5
+$as_echo_n "checking for Python 'pathlib' library... " >&6; }
+if ${pc_cv_python_module_pathlib+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_ext=py
+ac_compile='chmod +x conftest.$ac_ext >&5'
+ac_link='chmod +x conftest.$ac_ext && cp conftest.$ac_ext conftest >&5'
+     if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "cannot run test program while cross compiling
+See \`config.log' for more details" "$LINENO" 5; }
+else
+  cat > conftest.$ac_ext <<_ACEOF
+#!$PYTHON
+import sys
+try:
+    import pathlib
+except:
+    sys.exit(1)
+else:
+    sys.exit(0)
+
+
+_ACEOF
+if ac_fn_py_try_run "$LINENO"; then :
+  pc_cv_python_module_pathlib="yes"
+else
+  pc_cv_python_module_pathlib="no"
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+     ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $pc_cv_python_module_pathlib" >&5
+$as_echo "$pc_cv_python_module_pathlib" >&6; }
+if test "$pc_cv_python_module_pathlib" = "no"; then :
+  as_fn_append missing_python_packages "pathlib "
 fi
 
 if test "$VIRTUALENV" = no -a -n "$missing_python_packages"; then :
