@@ -3,6 +3,7 @@
 import os
 import threading
 import subprocess
+import signal
 import paho.mqtt.client as mqtt
 
 # We use flask to handle the HTTP requests
@@ -26,6 +27,7 @@ mqtt_server_port = int(os.environ.get("MQTT_SERVER_PORT", 8883))
 mqtt_server_username = os.environ.get("MQTT_SERVER_USERNAME", None)
 mqtt_server_password = os.environ.get("MQTT_SERVER_PASSWORD", None)
 mqtt_server_use_tls = json.loads(os.environ.get("MQTT_USE_TLS", "true"))
+mqtt_server_ca_certs = os.environ.get("MQTT_SERVER_CA_CERTS", None)
 mqtt_command_topic = os.environ.get("MQTT_COMMAND_TOPIC", "gate-opener/open")
 mqtt_response_topic = os.environ.get("MQTT_RESPONSE_TOPIC", "gate-opener/opened")
 
@@ -50,23 +52,24 @@ def on_disconnect(client, userdata, rc):
     global mqtt_client_connected
     mqtt_client_connected = False
     print(f"MQTT client disconnected")
-
     
 if mqtt_server_username is not None and mqtt_server_password is not None:
     mqtt_client.username_pw_set(mqtt_server_username, mqtt_server_password)
 
 if mqtt_server_use_tls:
-    mqtt_client.tls_set()
-    
+    mqtt_client.tls_set(ca_certs=mqtt_server_ca_certs)
+
 if mqtt_server_hostname is not None:
     mqtt_client.on_connect = on_connect
     mqtt_client.on_disconnect = on_disconnect
     try:
         mqtt_client.connect(mqtt_server_hostname, port=mqtt_server_port)                            
         mqtt_client.loop_start()
+        signal.signal(signal.SIGTERM, lambda x,y: mqtt_client.disconnect())
     except ConnectionRefusedError as e:
         print(f"Connection error when connecting to {mqtt_server_hostname}:{mqtt_server_port} as user={mqtt_server_username}, {e}")
-
+else:
+    print(f"No MQTT server specified")
 
 app = Flask(__name__)
 
