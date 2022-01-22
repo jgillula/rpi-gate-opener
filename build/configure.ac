@@ -131,7 +131,6 @@ PC_PYTHON_CHECK_MODULE([RPi.GPIO], , AS_VAR_APPEND([missing_python_packages], ["
 PC_PYTHON_CHECK_MODULE([paho.mqtt], , AS_VAR_APPEND([missing_python_packages], ["paho.mqtt "]))
 PC_PYTHON_CHECK_MODULE([argparse], , AS_VAR_APPEND([missing_python_packages], ["argparse "]))
 PC_PYTHON_CHECK_MODULE([pathlib], , AS_VAR_APPEND([missing_python_packages], ["pathlib "]))
-PC_PYTHON_CHECK_MODULE([json], , AS_VAR_APPEND([missing_python_packages], ["json "]))
 AS_IF([test "$VIRTUALENV" = no -a -n "$missing_python_packages"],
 	    AC_MSG_ERROR([The Python packages "$missing_python_packages" are missing and you have not chosen to use a virtual environment. Please either install the missing packages globally or use a virtual environment by running: ./configure --with-virtual-env]))
 
