@@ -85,7 +85,7 @@ def wait_for_mqtt_connected():
 def open_handler(access_token):
     if validate_access_token(access_token):
         if wait_for_mqtt_connected():
-            mqtt_client.publish(mqtt_command_topic, True, qos=1)
+            mqtt_client.publish(mqtt_command_topic, access_token, qos=1)
             with ack_lock:
                 ack = ack_lock.wait(ack_timeout)
                 if ack:            

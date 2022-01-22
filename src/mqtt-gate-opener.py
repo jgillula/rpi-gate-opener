@@ -92,8 +92,8 @@ response_topic = "gate-opener/opened"
 #         print(message.payload)
 
 
-def trigger_gate(mqtt_client):
-    print("Opening gate")
+def trigger_gate(mqtt_client, message):
+    print(f"Opening gate for {message}")
     sys.stdout.flush()
     GPIO.output(GPIO_PIN, GPIO.HIGH)
     time.sleep(0.25)
@@ -101,7 +101,7 @@ def trigger_gate(mqtt_client):
     mqtt_client.publish(response_topic, True, qos=1)
 
 def open_called(mqtt_client, userdata, msg):
-    trigger_gate(mqtt_client)
+    trigger_gate(mqtt_client, msg)
 
 def on_connect(mqtt_client, userdata, flags, rc):
     mqtt_client.message_callback_add(command_topic, open_called)

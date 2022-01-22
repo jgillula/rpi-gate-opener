@@ -4,3 +4,4 @@ open_gate
   - service: mqtt.publish
     data:
       topic: "gate-opener/open"
+      payload: "home-assistant"
