@@ -40,7 +40,7 @@ Now we need to set the following environment variables used to configure the con
 * `MQTT_RESPONSE_TOPIC` — (Optional) The topic to listen on to receive confirmation messages from the gate opener. Defaults to `gate-opener/opened`.
 * `ACCESS_TOKENS_LIST` — (Required) A json list of access tokens to use to access the service on the web. These tokens are the only thing protecting your gate opener from being accessed by anyone, so they should be long and random so that they can't be guessed or brute-forced, e.g. `['token1-I2JJVsEV5LCfbDqMMM1iL5rCh3VaNiqKNN2RQZrkZv7BjV7MShEmwxFXsx1210J6', 'token2-H3udRjyhuXKOUi2OU8E6PGpST5S78Fc79lDeftVurht6QKIbyqxZHsftIp8NMvfE']`
 
-It's easiest to just edit these in a file, and let Google Cloud Run read the file when we deploy the docker container in the next step. To do so, make a copy of `[environment_variables.yaml](environment_variables.yaml)` and save it as `my_environment_variables.yaml` in whichever directory you're working. Then open the file in your favorite editor, save, and close.
+It's easiest to just edit these in a file, and let Google Cloud Run read the file when we deploy the docker container in the next step. To do so, make a copy of [environment_variables.yaml](environment_variables.yaml) and save it as `my_environment_variables.yaml` in whichever directory you're working. Then open the file in your favorite editor, save, and close.
 
 ## 3. Deploy the docker image
 
