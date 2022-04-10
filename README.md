@@ -21,5 +21,6 @@ Great! Just follow [the instructions in my tutorial](https://www.hackster.io/jer
 - **[images](images)** — Pictures of the finished product
 - **[pcb](pcb)** — Extended Gerber (RS-274X) files for PCB fabrication (at, e.g., [OSH Park](https://oshpark.com/))
 - **[src](src)** — Source code for controlling the gate opener over MQTT (and Home Assistant). For more information, see [the instructions on hackster.io](https://www.hackster.io/jeremy-gillula/connecting-a-remote-gate-opener-to-a-raspberry-pi-734460#toc-7--bonus--controlling-the-gate-via-mqtt-and-home-assistant-8).
+- **[src/gate-opener-docker](src/gate-opener-docker)** — Files for a docker image you can use to control the gate opener from anywhere.
 - **[Gate_Opener_Controller_Circuit.fzz](Gate_Opener_Controller_Circuit.fzz)** — Fritzing file containing schematic and PCB layout
 - **[configure](configure)** — Run this script to generate the ```Makefile``` to install the code.
