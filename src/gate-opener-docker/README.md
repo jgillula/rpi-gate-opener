@@ -28,20 +28,7 @@ gcloud auth configure-docker us-west1-docker.pkg.dev
 
 If it asks you to enable the Artifact Registry, do so and then retry the last two commands. Then continue with
 
-## 2. Deploy the docker image
-
-Now do:
-
-```
-docker pull flyingsaucrdude/mqtt-gate-opener-remote 
-docker tag flyingsaucrdude/mqtt-gate-opener-remote us-west1-docker.pkg.dev/$PROJECT_NAME/gate-opener-repo/gate-opener
-docker push us-west1-docker.pkg.dev/$PROJECT_NAME/gate-opener-repo/gate-opener
-gcloud run deploy gate-opener --allow-unauthenticated --min-instances=0 --max-instances=1 --image us-west1-docker.pkg.dev/$PROJECT_NAME/gate-opener-repo/gate-opener
-```
-
-If it asks you to enable the Cloud Run API, do so.
-
-## 3. Configure the docker container
+## 2. Configure the docker container
 
 Now we need to set the following environment variables used to configure the container:
 * `MQTT_SERVER_HOSTNAME` — (Required) The hostname of your MQTT broker
@@ -53,14 +40,20 @@ Now we need to set the following environment variables used to configure the con
 * `MQTT_RESPONSE_TOPIC` — (Optional) The topic to listen on to receive confirmation messages from the gate opener. Defaults to `gate-opener/opened`.
 * `ACCESS_TOKENS_LIST` — (Required) A json list of access tokens to use to access the service on the web. These tokens are the only thing protecting your gate opener from being accessed by anyone, so they should be long and random so that they can't be guessed or brute-forced, e.g. `['token1-I2JJVsEV5LCfbDqMMM1iL5rCh3VaNiqKNN2RQZrkZv7BjV7MShEmwxFXsx1210J6', 'token2-H3udRjyhuXKOUi2OU8E6PGpST5S78Fc79lDeftVurht6QKIbyqxZHsftIp8NMvfE']`
 
-You could try setting these via the command line (by providing `--update-env-vars=KEY1=VALUE1,KEY2=VALUE2,...` to the last command), but I find it much easier to do so via Google's web-based Cloud Console.
+It's easiest to just edit these in a file, and let Google Cloud Run read the file when we deploy the docker container in the next step. To do so, make a copy of `[environment_variables.yaml](environment_variables.yaml)` and save it as `my_environment_variables.yaml` in whichever directory you're working. Then open the file in your favorite editor, save, and close.
 
-* Open up the Cloud Console by visiting https://console.cloud.google.com/run/detail/us-west1/gate-opener/metrics?project=PROJECT_NAME, where `PROJECT_NAME` is the same project name you chose earlier.
-* Choose "Edit & Deploy New Revision" from near the top.
-* Select the "Variables & Secrets" tab.
-* Click "Add Variable" to add and set the appropriate environment variables
-* Click "Deploy" at the bottom
-* Wait until the new revision is deployed
+## 3. Deploy the docker image
+
+Now do:
+
+```
+docker pull flyingsaucrdude/mqtt-gate-opener-remote 
+docker tag flyingsaucrdude/mqtt-gate-opener-remote us-west1-docker.pkg.dev/$PROJECT_NAME/gate-opener-repo/gate-opener
+docker push us-west1-docker.pkg.dev/$PROJECT_NAME/gate-opener-repo/gate-opener
+gcloud run deploy gate-opener --allow-unauthenticated --min-instances=0 --max-instances=1 --image us-west1-docker.pkg.dev/$PROJECT_NAME/gate-opener-repo/gate-opener --env-vars-file=my_environment_variables.yaml
+```
+
+If it asks you to enable the Cloud Run API, do so.
 
 ## 4. Check that it works
 
@@ -78,3 +71,11 @@ import random, string
 ```
 
 Although the resulting access URLs aren't memorable, they are persistent, bookmarkable, and shareable, so you can, e.g., give a unique access token/URL to each of your friends and family, and all they have to do is bookmark that URL to be able to come back and open your gate whenever they need to.
+
+## 5. Updating the service
+
+If you ever need to redeploy the service (e.g. if you add new access tokens or delete old ones), you can do so with:
+
+```
+gcloud run services update gate-opener --env-vars-file=my_environment_variables.yaml
+```
