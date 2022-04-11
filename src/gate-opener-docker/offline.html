@@ -1,28 +1,27 @@
 <html>
   <head>
-    <link rel="manifest" href="resources/manifest.webmanifest">
     <link rel="apple-touch-icon" sizes="180x180" href="resources/gate-180x180.png">
     <link rel="icon" type="image/png" sizes="48x48" href="resources/gate-48x48.png">
     <link rel="shortcut icon" href="resources/favicon.ico">
     <link href="resources/material-components-web.min.css" rel="stylesheet">
     <script src="resources/material-components-web.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gate Opener</title>
+    <title>Gate Opener Offline</title>
   </head>
   <body style="margin: 0px;">
     <header class="mdc-top-app-bar">
       <div class="mdc-top-app-bar__row">
         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-          <span class="mdc-top-app-bar__title">Gate Opener</span>
+          <span class="mdc-top-app-bar__title">Gate Opener Offline</span>
         </section>
       </div>
     </header>
     <main class="mdl-layout__content">
         <div class="page-content" style="height:100%; display: flex; justify-content: center; align-items: center;">
-          <button id="gate-opener-button" class="mdc-button mdc-button--raised" style="height: min(75vw, 50vh); aspect-ratio: 1; display: flex; flex-direction: column; justify-content: space-around; align-items: center; padding: 2vmin;">
+          <button id="gate-opener-button" class="mdc-button mdc-button--raised" style="height: min(75vw, 50vh); aspect-ratio: 1; display: flex; flex-direction: column; justify-content: space-around; align-items: center; padding: 2vmin;" disabled>
             <div class="mdc-button__ripple"></div>
             <img src="resources/gate.svg" style="width: 80%; flex: flex-grow; margin-top: 2vmin;"/>
-            <span class="mdc-button__label" style="font-size: min(7.5vw, 5vh);">Open Gate</span>
+            <span class="mdc-button__label" style="font-size: min(7.5vw, 5vh);">Offline</span>
           </button>
         </div>
         <aside id="snackbar" class="mdc-snackbar">

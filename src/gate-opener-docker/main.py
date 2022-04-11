@@ -112,10 +112,10 @@ def index_handler(access_token):
 
     
 # This is used to serve static files to the web browser
-@app.route('/<string:access_token>/resources/<path:subpath>')
+@app.route('/<string:access_token>/<path:subpath>')
 def static_handler(access_token, subpath):
     if validate_access_token(access_token):
-        return(send_from_directory("resources", subpath))
+        return(send_from_directory(".", subpath))
 
 
 # This checks to see if the provided token is in the set of access_tokens that has been uploaded by the Raspberry Pi client
