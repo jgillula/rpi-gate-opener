@@ -1,5 +1,6 @@
 {
   "name": "Gate Opener",
+  "background_color": "#121212",
   "display": "standalone",
   "start_url": "../index.html",
   "icons": [

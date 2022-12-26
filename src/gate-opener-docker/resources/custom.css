@@ -1,0 +1,14 @@
+.mdc-snackbar__action:not(:disabled) {
+    color: #b2dfdb;
+}
+.mdc-snackbar__label {
+    color: white;
+}
+body {
+    margin: 0px;
+    background: #121212;
+    --mdc-theme-primary: #262938;
+}
+.mdc-button--raised:disabled {
+    --mdc-protected-button-disabled-container-color: rgba(0,0,0,0.62);
+}

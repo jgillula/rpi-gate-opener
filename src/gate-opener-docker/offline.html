@@ -7,8 +7,9 @@
     <script src="resources/material-components-web.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Gate Opener Offline</title>
+    <link href="resources/custom.css" rel="stylesheet">
   </head>
-  <body style="margin: 0px;">
+  <body style="--mdc-protected-button-disabled-label-text-color: rgba(255,255,255,0.38);">
     <header class="mdc-top-app-bar">
       <div class="mdc-top-app-bar__row">
         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
@@ -20,7 +21,7 @@
         <div class="page-content" style="height:100%; display: flex; justify-content: center; align-items: center;">
           <button id="gate-opener-button" class="mdc-button mdc-button--raised" style="height: min(75vw, 50vh); aspect-ratio: 1; display: flex; flex-direction: column; justify-content: space-around; align-items: center; padding: 2vmin;" disabled>
             <div class="mdc-button__ripple"></div>
-            <img src="resources/gate.svg" style="width: 80%; flex: flex-grow; margin-top: 2vmin;"/>
+            <img src="resources/gate.svg" style="width: 80%; flex: flex-grow; margin-top: 2vmin; opacity: 0.38;"/>
             <span class="mdc-button__label" style="font-size: min(7.5vw, 5vh);">Offline</span>
           </button>
         </div>
