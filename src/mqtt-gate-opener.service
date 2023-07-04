@@ -6,6 +6,8 @@ After=network-online.target
 Type=simple
 User=pi
 ExecStart=/usr/local/lib/mqtt-gate-opener/mqtt-gate-opener.py -c /usr/local/etc/mqtt-gate-opener.conf
+Restart=on-failure
+RestartSec=30s
 
 [Install]
 WantedBy=multi-user.target
