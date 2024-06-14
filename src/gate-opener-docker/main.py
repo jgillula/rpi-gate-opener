@@ -105,10 +105,10 @@ def index_handler(access_token):
         else:
             print("MQTT client not connected when trying to serve index.html")
             abort(503)
-    else:
-        print("Invalid access token {}".format(access_token))
-        for token in access_tokens:
-            print(" {}".format(token))
+#    else:
+#        print("Invalid access token {}".format(access_token))
+#        for token in access_tokens:
+#            print(" {}".format(token))
 
     
 # This is used to serve static files to the web browser
