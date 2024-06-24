@@ -5,13 +5,14 @@ import argparse
 import pathlib
 import signal
 import sys
+import json
 import configparser
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
 
 GPIO_PIN = None
-command_topic = "gate-opener/open"
-response_topic = "gate-opener/opened"
+mqtt_command_topic = "gate-opener/open"
+mqtt_response_topic = "gate-opener/opened"
 
 # class Device:
 #     """Object to represent a generic MQTT device in Home Assistant."""
@@ -98,14 +99,19 @@ def trigger_gate(mqtt_client, source):
     GPIO.output(GPIO_PIN, GPIO.HIGH)
     time.sleep(0.25)
     GPIO.output(GPIO_PIN, GPIO.LOW)
-    mqtt_client.publish(response_topic, True, qos=1)
+    mqtt_client.publish(mqtt_response_topic, True, qos=1)
 
 def open_called(mqtt_client, userdata, msg):
     trigger_gate(mqtt_client, msg.payload)
 
 def on_connect(mqtt_client, userdata, flags, rc):
-    mqtt_client.message_callback_add(command_topic, open_called)
-    mqtt_client.subscribe(command_topic)
+    if rc == 0:
+        print("  Successfully connected to mqtt server")
+        sys.stdout.flush()
+        mqtt_client.message_callback_add(mqtt_command_topic, open_called)
+        mqtt_client.subscribe(mqtt_command_topic)
+    else:
+        print(" Unable to connect to MQTT server with reason code {}".format(rc))
 
 def mqtt_disconnect(mqtt_client):
     print("Shutting down MQTT gate opener")
@@ -136,10 +142,22 @@ if __name__ == "__main__":
     GPIO_PIN = int(config.get('GPIO_PIN', 11))
     mqtt_server = config.get('mqtt_server', 'localhost')
     mqtt_server_port = int(config.get('mqtt_server_port', 1883))
+    mqtt_server_username = config.get('mqtt_server_username', None)
+    mqtt_server_password = config.get('mqtt_server_password', None)
+    mqtt_server_use_tls = bool(json.loads(str.lower(config.get('mqtt_server_use_tls', "true"))))
+    mqtt_server_ca_certs = config.get("mqtt_server_ca_certs", None)
+    mqtt_command_topic = config.get("mqtt_command_topic", mqtt_command_topic)
+    mqtt_response_topic = config.get("mqtt_response_topic", mqtt_response_topic)
     print("Configuration read from {}:".format(str(args.config_filename.resolve())))
-    print(" GPIO_PIN={}".format(GPIO_PIN))
-    print(" mqtt_server={}".format(mqtt_server))
-    print(" mqtt_server_port={}".format(mqtt_server_port))
+    print("  GPIO_PIN={}".format(GPIO_PIN))
+    print("  mqtt_server={}".format(mqtt_server))
+    print("  mqtt_server_port={}".format(mqtt_server_port))
+    print("  mqtt_server_username={}".format(mqtt_server_username))
+    print("  mqtt_server_password={}".format(("<hidden>" if mqtt_server_password is not None else None)))
+    print("  mqtt_server_use_tls={}".format(mqtt_server_use_tls))
+    print("  mqtt_server_ca_certs={}".format(mqtt_server_ca_certs))
+    print("  mqtt_command_topic={}".format(mqtt_command_topic))
+    print("  mqtt_response_topic={}".format(mqtt_response_topic))
     sys.stdout.flush()
 
     GPIO.setmode(GPIO.BOARD)
@@ -147,13 +165,19 @@ if __name__ == "__main__":
 
     mqtt_client = mqtt.Client()
     mqtt_client.on_connect = on_connect
+
+    if mqtt_server_username is not None and mqtt_server_password is not None:
+        mqtt_client.username_pw_set(mqtt_server_username, mqtt_server_password)
+
+    if mqtt_server_use_tls:
+        mqtt_client.tls_set(ca_certs=mqtt_server_ca_certs)
+
+    print("Connecting to MQTT server...")
     mqtt_client.connect(mqtt_server, mqtt_server_port)
 
     #gate_opener_button = Button("gate_opener", trigger_gate, "Gate Opener", "mdi:gate-arrow-left")
     #gate_opener_button.connect(mqtt_server, mqtt_server_port)
     
-    print("MQTT gate opener running")
-    sys.stdout.flush()
     signal.signal(signal.SIGTERM, lambda x,y: mqtt_disconnect(mqtt_client))
  
     try:
